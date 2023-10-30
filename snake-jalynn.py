@@ -1,3 +1,4 @@
+import psutil
 import pygame
 import sys
 import random
@@ -9,11 +10,11 @@ WIDTH, HEIGHT = 640, 480
 GRID_SIZE = 20
 SNAKE_COLOR = (0, 255, 0)
 FRUIT_PROCESSES = {
-    "🍎": {"color": (255, 0, 0), "name": "Process A"},
-    "🍌": {"color": (255, 255, 0), "name": "Process B"},
-    "🍇": {"color": (128, 0, 128), "name": "Process C"},
-    "🍉": {"color": (255, 0, 255), "name": "Process D"},
-    "🍊": {"color": (255, 165, 0), "name": "Process E"},
+    "🍎": {"color": (255, 0, 0), "name": "Total CPU Usage", "func": psutil.cpu_percent},
+    "🍌": {"color": (255, 255, 0), "name": "Virtual Memory Usage", "func": lambda: psutil.virtual_memory().percent},
+    "🍇": {"color": (128, 0, 128), "name": "Disk Usage", "func": lambda: psutil.disk_usage('/').percent},
+    "🍉": {"color": (255, 0, 255), "name": "Network Sent", "func": lambda: psutil.net_io_counters().bytes_sent},
+    "🍊": {"color": (255, 165, 0), "name": "Network Received", "func": lambda: psutil.net_io_counters().bytes_recv},
 }
 
 # Initialize Pygame and set up the window
@@ -55,7 +56,8 @@ class SnakeGame:
     def _consume_fruit(self):
         fruit_emoji = self.fruit[1]
         process = FRUIT_PROCESSES[fruit_emoji]
-        print(f"The snake consumed resources from {process['name']} associated with {fruit_emoji}")
+        stat = process['func']()
+        print(f"The snake consumed resources from {process['name']} ({fruit_emoji}): {stat}")
 
     def change_direction(self, new_direction):
         if not self.game_over:
