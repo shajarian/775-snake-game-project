@@ -1,5 +1,14 @@
 # 775-snake-game-project
 
+# install dependencies
+
+```bash
+
+pip3 install -r requirements.txt
+
+```
+
+
 ```
 Project Title: Integrating Snake Video Game into an Operating System
 Group Member: Qinali Ma, Shaghayegh Shajarian, Ja’Lynn Joyce
