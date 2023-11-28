@@ -11,7 +11,7 @@ pip3 install -r requirements.txt
 
 ```bash
 
-python3 snake-jaylnn.py
+python3 snake-final-project.py
 
 ```
 ```
