@@ -7,7 +7,12 @@ import time
 
 # Initialize Pygame and its mixer
 pygame.init()
-pygame.mixer.init()
+pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
+
+fruit_sound_channel = pygame.mixer.Channel(1)  # Allocate channel 1 for fruit sounds
+pygame.mixer.music.set_volume(0.5)  # Set background music volume to 50%
+fruit_sound_channel.set_volume(1.0)  # Set volume to maximum for the fruit sound channel
+
 
 # Constants
 BACKGROUND_MUSIC = "snake-background.mp3"
@@ -60,19 +65,34 @@ FRUIT_SOUNDS = {
 }
 
 
-# Fruit processes
+# # Fruit processes
+# FRUIT_PROCESSES = {
+#     "🍎": {"color": (255, 0, 0), "name": "Total CPU Usage", "func": psutil.cpu_percent},
+#     "🍌": {"color": (255, 255, 0), "name": "Virtual Memory Usage", "func": lambda: psutil.virtual_memory().percent},
+#     "🍇": {"color": (128, 0, 128), "name": "Disk Usage", "func": lambda: psutil.disk_usage('/').percent},
+#     "🍉": {"color": (255, 0, 255), "name": "Network Sent", "func": lambda: psutil.net_io_counters().bytes_sent},
+#     "🍊": {"color": (255, 165, 0), "name": "Network Received", "func": lambda: psutil.net_io_counters().bytes_recv},
+#     "🍍": {"color": (255, 255, 0), "name": "Swap Memory Usage", "func": lambda: psutil.swap_memory().percent},
+#     "🍒": {"color": (255, 0, 0), "name": "CPU Load (1 min)", "func": lambda: psutil.getloadavg()[0]},
+#     #"🍓": {"color": (255, 0, 0), "name": "CPU Frequency", "func": lambda: psutil.cpu_freq().current if psutil.cpu_freq() else "N/A"},
+#     "🍋": {"color": (255, 255, 0), "name": "System Uptime", "func": lambda: int(time.time() - psutil.boot_time())},
+#     "🥥": {"color": (128, 128, 128), "name": "Number of Processes", "func": lambda: len(psutil.pids())},
+# }
+
+# Fruit processes with sound file names
 FRUIT_PROCESSES = {
-    "🍎": {"color": (255, 0, 0), "name": "Total CPU Usage", "func": psutil.cpu_percent},
-    "🍌": {"color": (255, 255, 0), "name": "Virtual Memory Usage", "func": lambda: psutil.virtual_memory().percent},
-    "🍇": {"color": (128, 0, 128), "name": "Disk Usage", "func": lambda: psutil.disk_usage('/').percent},
-    "🍉": {"color": (255, 0, 255), "name": "Network Sent", "func": lambda: psutil.net_io_counters().bytes_sent},
-    "🍊": {"color": (255, 165, 0), "name": "Network Received", "func": lambda: psutil.net_io_counters().bytes_recv},
-    "🍍": {"color": (255, 255, 0), "name": "Swap Memory Usage", "func": lambda: psutil.swap_memory().percent},
-    "🍒": {"color": (255, 0, 0), "name": "CPU Load (1 min)", "func": lambda: psutil.getloadavg()[0]},
-    #"🍓": {"color": (255, 0, 0), "name": "CPU Frequency", "func": lambda: psutil.cpu_freq().current if psutil.cpu_freq() else "N/A"},
-    "🍋": {"color": (255, 255, 0), "name": "System Uptime", "func": lambda: int(time.time() - psutil.boot_time())},
-    "🥥": {"color": (128, 128, 128), "name": "Number of Processes", "func": lambda: len(psutil.pids())},
+    "🍎": {"color": (255, 0, 0), "name": "Total CPU Usage", "func": psutil.cpu_percent, "sound": "apple.mp3"},
+    "🍌": {"color": (255, 255, 0), "name": "Virtual Memory Usage", "func": lambda: psutil.virtual_memory().percent, "sound": "banana.mp3"},
+    "🍇": {"color": (128, 0, 128), "name": "Disk Usage", "func": lambda: psutil.disk_usage('/').percent, "sound": "grapes.mp3"},
+    "🍉": {"color": (255, 0, 255), "name": "Network Sent", "func": lambda: psutil.net_io_counters().bytes_sent, "sound": "watermelon.mp3"},
+    "🍊": {"color": (255, 165, 0), "name": "Network Received", "func": lambda: psutil.net_io_counters().bytes_recv, "sound": "orange.mp3"},
+    "🍍": {"color": (255, 255, 0), "name": "Swap Memory Usage", "func": lambda: psutil.swap_memory().percent, "sound": "pineapple.mp3"},
+    "🍒": {"color": (255, 0, 0), "name": "CPU Load (1 min)", "func": lambda: psutil.getloadavg()[0], "sound": "cherries.mp3"},
+    # "🍓": {"color": (255, 0, 0), "name": "CPU Frequency", "func": lambda: psutil.cpu_freq().current if psutil.cpu_freq() else "N/A", "sound": "strawberry.mp3"},
+    "🍋": {"color": (255, 255, 0), "name": "System Uptime", "func": lambda: int(time.time() - psutil.boot_time()), "sound": "lemon.mp3"},
+    "🥥": {"color": (128, 128, 128), "name": "Number of Processes", "func": lambda: len(psutil.pids()), "sound": "coconut.mp3"},
 }
+
 
 
 class SnakeGame:
@@ -85,13 +105,25 @@ class SnakeGame:
         self.high_score = self.load_high_score()
         self.message = ""
 
+    # def _generate_fruit(self):
+    #     while True:
+    #         fruit_position = (random.randint(0, (WIDTH // GRID_SIZE) - 1) * GRID_SIZE,
+    #                           random.randint(0, (GAME_HEIGHT // GRID_SIZE) - 1) * GRID_SIZE)
+    #         fruit_emoji = random.choice(list(FRUIT_PROCESSES.keys()))
+    #         if fruit_position not in self.snake:
+    #             return fruit_position, fruit_emoji
     def _generate_fruit(self):
         while True:
             fruit_position = (random.randint(0, (WIDTH // GRID_SIZE) - 1) * GRID_SIZE,
                               random.randint(0, (GAME_HEIGHT // GRID_SIZE) - 1) * GRID_SIZE)
             fruit_emoji = random.choice(list(FRUIT_PROCESSES.keys()))
             if fruit_position not in self.snake:
+                # Play the sound for the new fruit
+                fruit_name = FRUIT_PROCESSES[fruit_emoji]['name'].split()[0].lower()
+                if fruit_name in FRUIT_SOUNDS:
+                    fruit_sound_channel.play(FRUIT_SOUNDS[fruit_name])
                 return fruit_position, fruit_emoji
+
 
     def move_snake(self):
         if self.game_over:
@@ -110,6 +142,36 @@ class SnakeGame:
                 self._consume_fruit()
                 self.fruit = self._generate_fruit()
 
+    # def _consume_fruit(self):
+    #     fruit_emoji = self.fruit[1]
+    #     process = FRUIT_PROCESSES[fruit_emoji]
+    #     stat = process['func']()
+        
+    #     # Update the message to include the emoji
+    #     self.message = f"{fruit_emoji} {process['name']}: {stat}"
+
+    #     self.score += 1  # Increase score
+
+    #     # Update high score if necessary
+    #     if self.score > self.high_score:
+    #         self.high_score = self.score
+    #         self.save_high_score(self.high_score)
+
+    #     # Determine the fruit name from the emoji
+    #     fruit_name = process['name'].split()[0].lower()
+
+    #     # Play sound for the consumed fruit
+    #      # Play sound for the consumed fruit
+    #     if fruit_name in FRUIT_SOUNDS:
+    #         fruit_sound_channel.play(FRUIT_SOUNDS[fruit_name])  # Play on the allocated channel
+
+
+    #     # Extend the snake's length
+    #     self.snake.append(self.snake[-1])
+
+    #     # Generate a new fruit
+    #     self.fruit = self._generate_fruit()
+
     def _consume_fruit(self):
         fruit_emoji = self.fruit[1]
         process = FRUIT_PROCESSES[fruit_emoji]
@@ -125,12 +187,12 @@ class SnakeGame:
             self.high_score = self.score
             self.save_high_score(self.high_score)
 
-        # Determine the fruit name from the emoji
-        fruit_name = process['name'].split()[0].lower()
-
         # Play sound for the consumed fruit
-        if fruit_name in FRUIT_SOUNDS:
-            FRUIT_SOUNDS[fruit_name].play()
+        fruit_sound_file = process.get("sound")
+        if fruit_sound_file and os.path.exists(os.path.join(FRUIT_SOUNDS_FOLDER, fruit_sound_file)):
+            pygame.mixer.music.stop()  # Stop any currently playing music
+            pygame.mixer.music.load(os.path.join(FRUIT_SOUNDS_FOLDER, fruit_sound_file))
+            pygame.mixer.music.play()
 
         # Extend the snake's length
         self.snake.append(self.snake[-1])
@@ -228,6 +290,4 @@ if __name__ == "__main__":
     main()
 
 
-if __name__ == "__main__":
-    main()
 
