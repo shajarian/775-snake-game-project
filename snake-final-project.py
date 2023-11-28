@@ -15,7 +15,7 @@ fruit_sound_channel.set_volume(1.0)  # Set volume to maximum for the fruit sound
 
 
 # Constants
-BACKGROUND_MUSIC = "snake-background.mp3"
+BACKGROUND_MUSIC = "background.mp3"
 FRUIT_SOUNDS_FOLDER = 'fruit-rap/'
 WIDTH, HEIGHT = 640, 480
 PANEL_HEIGHT = 60
