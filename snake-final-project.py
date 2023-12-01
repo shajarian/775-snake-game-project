@@ -26,7 +26,7 @@ FONT = pygame.font.Font(None, 24)
 HIGH_SCORE_FILE = "highscore.txt"
 EMOJI_FOLDER = "emoji-images/imgs"
 #TITLE_SCREEN_IMAGE = "snake-game-image.png" 
-TITLE_SCREEN_IMAGE = "game-new-background.png" 
+TITLE_SCREEN_IMAGE = "game_new_background.png" 
 
 FRUIT_SIZE = (GRID_SIZE, GRID_SIZE)
 # Game states
