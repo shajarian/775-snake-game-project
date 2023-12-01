@@ -25,7 +25,8 @@ SNAKE_COLOR = (0, 255, 0)
 FONT = pygame.font.Font(None, 24)
 HIGH_SCORE_FILE = "highscore.txt"
 EMOJI_FOLDER = "emoji-images/imgs"
-TITLE_SCREEN_IMAGE = "snake-game-image.png"  # Replace with your image path
+#TITLE_SCREEN_IMAGE = "snake-game-image.png" 
+TITLE_SCREEN_IMAGE = "game-new-background.png" 
 
 FRUIT_SIZE = (GRID_SIZE, GRID_SIZE)
 # Game states
