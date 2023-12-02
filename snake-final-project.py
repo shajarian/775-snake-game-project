@@ -260,7 +260,7 @@ def main():
     game = SnakeGame()
 
     # Load title screen image
-    title_screen = pygame.transform.scale(pygame.image.load("snake-game-image.png"), (WIDTH, HEIGHT))
+    title_screen = pygame.transform.scale(pygame.image.load("game_new_background.png"), (WIDTH, HEIGHT))
     global game_state  # Access the global game_state variable
 
     start_font = pygame.font.Font(None, 72)  # Increase the font size to 36
