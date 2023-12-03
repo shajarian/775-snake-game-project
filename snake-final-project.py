@@ -47,6 +47,7 @@ else:
     print(f"Unable to find music file: {BACKGROUND_MUSIC}")
 
 # Load fruit images
+try:
     FRUIT_IMAGES = {
         "🍎": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f34e.png')), FRUIT_SIZE),  # Apple
         "🍌": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f34c.png')), FRUIT_SIZE),  # Banana
@@ -59,7 +60,10 @@ else:
         "🍋": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f34b.png')), FRUIT_SIZE),  # Lemon
         "🥥": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f965.png')), FRUIT_SIZE),  # Coconut
     }
-
+except Exception as e:
+    logging.error(f"Failed to load resources: {e}")
+    game.error_message = "Error loading game resources. Please check the log file for details."
+    game.error_logged = True
 
 
 # Load fruit sounds
@@ -128,22 +132,16 @@ class SnakeGame:
     #         if fruit_position not in self.snake:
     #             return fruit_position, fruit_emoji
     def _generate_fruit(self):
-        try:
-            while True:
-                fruit_position = (random.randint(0, (WIDTH // GRID_SIZE) - 1) * GRID_SIZE,
-                                random.randint(0, (GAME_HEIGHT // GRID_SIZE) - 1) * GRID_SIZE)
-                fruit_emoji = random.choice(list(FRUIT_PROCESSES.keys()))
-                if fruit_position not in self.snake:
-                    # Play the sound for the new fruit
-                    fruit_name = FRUIT_PROCESSES[fruit_emoji]['name'].split()[0].lower()
-                    if fruit_name in FRUIT_SOUNDS:
-                        fruit_sound_channel.play(FRUIT_SOUNDS[fruit_name])
-                    return fruit_position, fruit_emoji
-        except Exception as e:
-            if not self.error_logged:  # Check if an error has already been logged
-                logging.error("Error handling key press: %s", e)
-                self.error_message = "An error occurred. Please check the log file for details."  # Set the generic error message
-                self.error_logged = True  # Set the flag to True after logging
+        while True:
+            fruit_position = (random.randint(0, (WIDTH // GRID_SIZE) - 1) * GRID_SIZE,
+                              random.randint(0, (GAME_HEIGHT // GRID_SIZE) - 1) * GRID_SIZE)
+            fruit_emoji = random.choice(list(FRUIT_PROCESSES.keys()))
+            if fruit_position not in self.snake:
+                # Play the sound for the new fruit
+                fruit_name = FRUIT_PROCESSES[fruit_emoji]['name'].split()[0].lower()
+                if fruit_name in FRUIT_SOUNDS:
+                    fruit_sound_channel.play(FRUIT_SOUNDS[fruit_name])
+                return fruit_position, fruit_emoji
 
 
     def move_snake(self):
@@ -203,38 +201,32 @@ class SnakeGame:
     #     self.fruit = self._generate_fruit()
 
     def _consume_fruit(self):
-        try:
-            fruit_emoji = self.fruit[1]
-            process = FRUIT_PROCESSES[fruit_emoji]
-            stat = process['func']()
-            
-            # Update the message to include the emoji
-            self.message = f"{fruit_emoji} {process['name']}: {stat}"
+        fruit_emoji = self.fruit[1]
+        process = FRUIT_PROCESSES[fruit_emoji]
+        stat = process['func']()
+        
+        # Update the message to include the emoji
+        self.message = f"{fruit_emoji} {process['name']}: {stat}"
 
-            self.score += 1  # Increase score
+        self.score += 1  # Increase score
 
-            # Update high score if necessary
-            if self.score > self.high_score:
-                self.high_score = self.score
-                self.save_high_score(self.high_score)
+        # Update high score if necessary
+        if self.score > self.high_score:
+            self.high_score = self.score
+            self.save_high_score(self.high_score)
 
-            # Play sound for the consumed fruit
-            fruit_sound_file = process.get("sound")
-            if fruit_sound_file and os.path.exists(os.path.join(FRUIT_SOUNDS_FOLDER, fruit_sound_file)):
-                pygame.mixer.music.stop()  # Stop any currently playing music
-                pygame.mixer.music.load(os.path.join(FRUIT_SOUNDS_FOLDER, fruit_sound_file))
-                pygame.mixer.music.play()
+        # Play sound for the consumed fruit
+        fruit_sound_file = process.get("sound")
+        if fruit_sound_file and os.path.exists(os.path.join(FRUIT_SOUNDS_FOLDER, fruit_sound_file)):
+            pygame.mixer.music.stop()  # Stop any currently playing music
+            pygame.mixer.music.load(os.path.join(FRUIT_SOUNDS_FOLDER, fruit_sound_file))
+            pygame.mixer.music.play()
 
-            # Extend the snake's length
-            self.snake.append(self.snake[-1])
+        # Extend the snake's length
+        self.snake.append(self.snake[-1])
 
-            # Generate a new fruit
-            self.fruit = self._generate_fruit()
-        except Exception as e:
-            if not self.error_logged:  # Check if an error has already been logged
-                logging.error("Error handling key press: %s", e)
-                self.error_message = "An error occurred. Please check the log file for details."  # Set the generic error message
-                self.error_logged = True  # Set the flag to True after logging
+        # Generate a new fruit
+        self.fruit = self._generate_fruit()
 
 
     def change_direction(self, new_direction):
