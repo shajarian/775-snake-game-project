@@ -9,6 +9,7 @@ import time
 pygame.init()
 pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
 
+
 fruit_sound_channel = pygame.mixer.Channel(1)  # Allocate channel 1 for fruit sounds
 pygame.mixer.music.set_volume(0.5)  # Set background music volume to 50%
 fruit_sound_channel.set_volume(1.0)  # Set volume to maximum for the fruit sound channel
