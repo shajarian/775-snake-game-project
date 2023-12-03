@@ -8,10 +8,20 @@ import logging
 from win10toast import ToastNotifier
 
 # Configure logging to save error messages to a file
-LOG_FILE_PATH = 'game_errors.log'
-logging.basicConfig(filename=LOG_FILE_PATH, level=logging.ERROR)
+log_file_path = 'game_errors.log'
+logging.basicConfig(filename=log_file_path, level=logging.ERROR)
 # Set restrictive permissions for the log file
-os.chmod(LOG_FILE_PATH, 0o600)
+os.chmod(log_file_path, 0o600)
+
+# Check if it works or not
+# Get the file permissions as an octal number
+file_permissions = os.stat(log_file_path).st_mode
+# Check if the owner has read and write permissions (0o600)
+if file_permissions & 0o700 == 0o600:
+    print(f"The file permissions for {log_file_path} are set to 0o600 (read and write for the owner).")
+else:
+    print(f"The file permissions for {log_file_path} are NOT set to 0o600.")
+
 
 #Initialize the ToastNotifier
 toaster = ToastNotifier()
