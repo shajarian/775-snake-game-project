@@ -5,9 +5,13 @@ import random
 import os
 import time
 import logging
+from win10toast import ToastNotifier
 
 # Configure logging to save error messages to a file
 logging.basicConfig(filename='game_errors.log', level=logging.ERROR)
+
+#Initialize the ToastNotifier
+toaster = ToastNotifier()
 
 # Initialize Pygame and its mixer
 pygame.init()
@@ -105,21 +109,27 @@ FRUIT_PROCESSES = {
 }
 
 def display_resource_metrics():
-    current_pid = os.getpid()
-    process = psutil.Process(current_pid)
+    try:
+        current_pid = os.getpid()
+        process = psutil.Process(current_pid)
 
-    # CPU and Memory Usage
-    cpu_percent = process.cpu_percent(interval=None)  # Set interval to None for non-blocking call
-    memory_usage_mb = process.memory_info().rss / (1024 * 1024)
+        # CPU and Memory Usage
+        cpu_percent = process.cpu_percent(interval=None)  # Set interval to None for non-blocking call
+        memory_usage_mb = process.memory_info().rss / (1024 * 1024)
 
-    # Disk Usage
-    disk_io = process.io_counters()
-    disk_read_mb = disk_io.read_bytes / (1024 * 1024)
-    disk_write_mb = disk_io.write_bytes / (1024 * 1024)
+        # Disk Usage
+        disk_io = process.io_counters()
+        disk_read_mb = disk_io.read_bytes / (1024 * 1024)
+        disk_write_mb = disk_io.write_bytes / (1024 * 1024)
 
-    resource_metrics = (f"CPU Usage: {cpu_percent}% | Memory Usage: {memory_usage_mb:.2f} MB | "
-                        f"Disk Read: {disk_read_mb:.2f} MB | Disk Write: {disk_write_mb:.2f} MB")
-    return resource_metrics
+        resource_metrics = (f"CPU Usage: {cpu_percent}% | Memory Usage: {memory_usage_mb:.2f} MB | "
+                            f"Disk Read: {disk_read_mb:.2f} MB | Disk Write: {disk_write_mb:.2f} MB")
+        return resource_metrics
+    except Exception as e:
+        notification_title = "Error in Resource Metrics"
+        notification_message = f"An error occurred: {str(e)}"
+        toaster.show_toast(notification_title, notification_message, duration=5)
+        return "Error retrieving resource metrics"
 
 
 class SnakeGame:
@@ -218,6 +228,11 @@ class SnakeGame:
         
         # Update the message to include the emoji
         self.message = f"{fruit_emoji} {process['name']}: {stat}"
+
+        # # Display a toast notification
+        # notification_title = f"New Fruit Consumed: {fruit_emoji}"
+        # notification_message = f"{process['name']}: {stat}"
+        # toaster.show_toast(notification_title, notification_message, duration=1)
 
         self.score += 1  # Increase score
 
@@ -324,10 +339,12 @@ def main():
                         if event.key == pygame.K_s:  # Press 'S' to start the game
                             game_state = GAME
                             game = SnakeGame()  # Reset the game
+                            toaster.show_toast("Game Started", "Press 'Q' to Quit", duration=4)
                     elif game_state == GAME:
                         if game.game_over:
                             if event.key == pygame.K_r:
                                 game = SnakeGame()
+                                toaster.show_toast("Game Restarted", "Press 'Q' to Quit", duration=4)
                             elif event.key == pygame.K_q:
                                 pygame.quit()
                                 sys.exit()
