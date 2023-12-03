@@ -47,23 +47,18 @@ else:
     print(f"Unable to find music file: {BACKGROUND_MUSIC}")
 
 # Load fruit images
-try:
-    FRUIT_IMAGES = {
-        "🍎": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f34e.png')), FRUIT_SIZE),  # Apple
-        "🍌": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f34c.png')), FRUIT_SIZE),  # Banana
-        "🍇": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f347.png')), FRUIT_SIZE),  # Grapes
-        "🍉": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f349.png')), FRUIT_SIZE),  # Watermelon
-        "🍊": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f34a.png')), FRUIT_SIZE),  # Orange
-        "🍍": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f34d.png')), FRUIT_SIZE),  # Pineapple
-        "🍒": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f352.png')), FRUIT_SIZE),  # Cherries
-        #"🍓": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f353.png')), FRUIT_SIZE),  # Strawberry
-        "🍋": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f34b.png')), FRUIT_SIZE),  # Lemon
-        "🥥": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f965.png')), FRUIT_SIZE),  # Coconut
-    }
-except Exception as e:
-    logging.error(f"Failed to load resources: {e}")
-    game.error_message = "Error loading game resources. Please check the log file for details."
-    game.error_logged = True
+FRUIT_IMAGES = {
+    "🍎": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f34e.png')), FRUIT_SIZE),  # Apple
+    "🍌": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f34c.png')), FRUIT_SIZE),  # Banana
+    "🍇": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f347.png')), FRUIT_SIZE),  # Grapes
+    "🍉": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f349.png')), FRUIT_SIZE),  # Watermelon
+    "🍊": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f34a.png')), FRUIT_SIZE),  # Orange
+    "🍍": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f34d.png')), FRUIT_SIZE),  # Pineapple
+    "🍒": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f352.png')), FRUIT_SIZE),  # Cherries
+    #"🍓": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f353.png')), FRUIT_SIZE),  # Strawberry
+    "🍋": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f34b.png')), FRUIT_SIZE),  # Lemon
+    "🥥": pygame.transform.scale(pygame.image.load(os.path.join(EMOJI_FOLDER, '1f965.png')), FRUIT_SIZE),  # Coconut
+}
 
 
 # Load fruit sounds
@@ -109,6 +104,22 @@ FRUIT_PROCESSES = {
     "🥥": {"color": (128, 128, 128), "name": "Number of Processes", "func": lambda: len(psutil.pids()), "sound": "coconut.mp3"},
 }
 
+def display_resource_metrics():
+    current_pid = os.getpid()
+    process = psutil.Process(current_pid)
+
+    # CPU and Memory Usage
+    cpu_percent = process.cpu_percent(interval=None)  # Set interval to None for non-blocking call
+    memory_usage_mb = process.memory_info().rss / (1024 * 1024)
+
+    # Disk Usage
+    disk_io = process.io_counters()
+    disk_read_mb = disk_io.read_bytes / (1024 * 1024)
+    disk_write_mb = disk_io.write_bytes / (1024 * 1024)
+
+    resource_metrics = (f"CPU Usage: {cpu_percent}% | Memory Usage: {memory_usage_mb:.2f} MB | "
+                        f"Disk Read: {disk_read_mb:.2f} MB | Disk Write: {disk_write_mb:.2f} MB")
+    return resource_metrics
 
 
 class SnakeGame:
@@ -232,6 +243,11 @@ class SnakeGame:
     def change_direction(self, new_direction):
         if not self.game_over and (new_direction[0] * -1, new_direction[1] * -1) != self.direction:
             self.direction = new_direction
+    
+    def draw_resource_metrics(self, screen):
+        resource_metrics = display_resource_metrics()
+        metrics_text_surface = FONT.render(resource_metrics, True, (255, 255, 255))
+        screen.blit(metrics_text_surface, (5, HEIGHT - PANEL_HEIGHT - 20))
 
     def draw(self, screen):
         for segment in self.snake:
@@ -343,6 +359,7 @@ def main():
             if game.game_over:
                 game_over_text = FONT.render("Game Over! Press 'R' to Restart or 'Q' to Quit", True, (255, 0, 0))
                 screen.blit(game_over_text, (WIDTH // 4, HEIGHT // 2))
+            game.draw_resource_metrics(screen)
 
         pygame.display.flip()
         clock.tick(10)
