@@ -393,7 +393,7 @@ def main():
             game.draw_resource_metrics(screen)
 
         pygame.display.flip()
-        clock.tick(8)
+        clock.tick(10)
 
 if __name__ == "__main__":
     main()
