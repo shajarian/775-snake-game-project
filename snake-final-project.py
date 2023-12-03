@@ -343,39 +343,31 @@ def main():
 
 
     while True:
-        try:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == pygame.KEYDOWN:
-                    if game_state == MENU:
-                        if event.key == pygame.K_s:  # Press 'S' to start the game
-                            game_state = GAME
-                            game = SnakeGame()  # Reset the game
-                            toaster.show_toast("Game Started", "Press 'Q' to Quit", duration=4)
-                    elif game_state == GAME:
-                        if game.game_over:
-                            if event.key == pygame.K_r:
-                                game = SnakeGame()
-                                toaster.show_toast("Game Restarted", "Press 'Q' to Quit", duration=4)
-                            elif event.key == pygame.K_q:
-                                pygame.quit()
-                                sys.exit()
-                        else:
-                            if event.key == pygame.K_UP:
-                                game.change_direction((0, -1))
-                            elif event.key == pygame.K_DOWN:
-                                game.change_direction((0, 1))
-                            elif event.key == pygame.K_LEFT:
-                                game.change_direction((-1, 0))
-                            elif event.key == pygame.K_RIGHT:
-                                game.change_direction((1, 0))
-        except Exception as e:
-            if not game.error_logged:  # Check if an error has already been logged
-                logging.error("Error handling input event: %s", e)
-                game.error_message = "An error occurred. Please check the log file for details."  # Set the generic error message
-                game.error_logged = True  # Set the flag to True after logging
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if game_state == MENU:
+                    if event.key == pygame.K_s:  # Press 'S' to start the game
+                        game_state = GAME
+                        game = SnakeGame()  # Reset the game
+                elif game_state == GAME:
+                    if game.game_over:
+                        if event.key == pygame.K_r:
+                            game = SnakeGame()
+                        elif event.key == pygame.K_q:
+                            pygame.quit()
+                            sys.exit()
+                    else:
+                        if event.key == pygame.K_UP:
+                            game.change_direction((0, -1))
+                        elif event.key == pygame.K_DOWN:
+                            game.change_direction((0, 1))
+                        elif event.key == pygame.K_LEFT:
+                            game.change_direction((-1, 0))
+                        elif event.key == pygame.K_RIGHT:
+                            game.change_direction((1, 0))
 
         screen.fill((0, 0, 0))
 
