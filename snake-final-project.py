@@ -182,7 +182,7 @@ class SnakeGame:
         try:
             # Intentional error for testing
             #test_error = 1 / 0  # This will cause a ZeroDivisionError
-            #self.snake = []
+            self.snake = []
             if self.game_over:
                 return
 
