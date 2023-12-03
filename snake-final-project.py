@@ -182,7 +182,7 @@ class SnakeGame:
         try:
             # Intentional error for testing
             #test_error = 1 / 0  # This will cause a ZeroDivisionError
-            self.snake = []
+            #self.snake = []
             if self.game_over:
                 return
 
@@ -274,8 +274,8 @@ class SnakeGame:
     
     def draw_resource_metrics(self, screen):
         resource_metrics = display_resource_metrics()
-        small_font = pygame.font.Font(None, 16)
-        metrics_text_surface = small_font.render(resource_metrics, True, (255, 255, 255))
+        #small_font = pygame.font.Font(None, 16)
+        metrics_text_surface = FONT.render(resource_metrics, True, (255, 255, 255))
         screen.blit(metrics_text_surface, (5, HEIGHT - PANEL_HEIGHT - 20))
 
     def draw(self, screen):
