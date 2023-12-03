@@ -8,11 +8,11 @@ import logging
 from win10toast import ToastNotifier
 
 # Configure logging to save error messages to a file
+
 log_file_path = 'game_errors.log'
 logging.basicConfig(filename=log_file_path, level=logging.ERROR)
 # Set restrictive permissions for the log file
 os.chmod(log_file_path, 0o600)
-
 # Check if it works or not
 # Get the file permissions as an octal number
 file_permissions = os.stat(log_file_path).st_mode
@@ -274,8 +274,9 @@ class SnakeGame:
     
     def draw_resource_metrics(self, screen):
         resource_metrics = display_resource_metrics()
-        metrics_text_surface = FONT.render(resource_metrics, True, (255, 255, 255))
-        screen.blit(metrics_text_surface, (5, HEIGHT - PANEL_HEIGHT - 40))
+        small_font = pygame.font.Font(None, 16)
+        metrics_text_surface = small_font.render(resource_metrics, True, (255, 255, 255))
+        screen.blit(metrics_text_surface, (5, HEIGHT - PANEL_HEIGHT - 20))
 
     def draw(self, screen):
         for segment in self.snake:
@@ -392,7 +393,7 @@ def main():
             game.draw_resource_metrics(screen)
 
         pygame.display.flip()
-        clock.tick(10)
+        clock.tick(8)
 
 if __name__ == "__main__":
     main()
