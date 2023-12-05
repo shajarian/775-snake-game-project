@@ -135,8 +135,8 @@ def display_resource_metrics():
         disk_read_mb = disk_io.read_bytes / (1024 * 1024)
         disk_write_mb = disk_io.write_bytes / (1024 * 1024)
 
-        resource_metrics = (f"CPU Usage: {cpu_percent}% | Memory Usage: {memory_usage_mb:.2f} MB | "
-                            f"Disk Read: {disk_read_mb:.2f} MB | Disk Write: {disk_write_mb:.2f} MB")
+        resource_metrics = (f"PID {current_pid} (CPU Usage: {cpu_percent}% | Memory Usage: {memory_usage_mb:.2f} MB | "
+                            f"Disk Read: {disk_read_mb:.2f})")
         return resource_metrics
     except Exception as e:
         notification_title = "Error in Resource Metrics"
@@ -393,7 +393,7 @@ def main():
             game.draw_resource_metrics(screen)
 
         pygame.display.flip()
-        clock.tick(10)
+        clock.tick(6)
 
 if __name__ == "__main__":
     main()
