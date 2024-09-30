@@ -16,7 +16,6 @@ python3 snake-final-project.py
 ```
 ```
 Project Title: Integrating Snake Video Game into an Operating System
-Group Member: Qinali Ma, Shaghayegh Shajarian, Ja’Lynn Joyce
 Objective: Enhance the user experience of the operating system by integrating a gaming feature that most
 are familiar with. The Snake video game aims to entertain and pay homage to the classic Snake game
 while adapting it to modern technology. By integrating the game within the operating system, we aim to
